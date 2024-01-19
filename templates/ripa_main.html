@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+    <title>RIPA</title>
+    {% include "styles.html" %}
+</head>
+<body>
+<div style="padding: 25px 25px 25px 25px;">
+    <h2>Counties</h2>
+    <table class="table table-striped">
+    <tr>
+        <th>Code</th>
+        <th>County Name</th>
+        <th>Stops #</th>
+        <th>Years for Data</th>
+    </tr>
+    {% for county in counties %}
+        <tr>
+            <td>{{ county.code }}</td>
+            <td>{{ county.name }}</td>
+            <td>{{ county.count }}</td>
+            <td>{{ county.years }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+</body></html>

@@ -1,0 +1,57 @@
+
+1) execute:
+
+% virtualenv .venv
+% source .venv/bin/activate
+
+Recently, I have to do '% source .venv/local/bin/activate'. Why the change?
+
+% pip install -r requirements.txt
+
+2) change references to 'app' in app.py to desired application name. Make sure to rename all
+references to 'app'. Rename the app.py file and any html files.
+
+3) edit the env file and rename it to .env:
+
+FLASK_APP=app
+FLASK_ENV=development
+FLASK_DEBUG=1
+FLASK_RUN_PORT=8080
+APP_HOME=<directory_containing_app.py>
+USR=<you>
+HOST=localhost
+PWD=<pwd>
+DB=<dbName>
+WWW=app/
+
+I use the WWW variable because I want to test by connecting directly to the app, either on my
+laptop or on my colo server, and I want to be able to run multiple apps via apache with the
+same code and this is how I have worked it out.
+
+When connecting directly, set to a prefix name. When one is connecting via apache, one uses that
+same prefix to identify the app and the app code itself does not know about the prefix.
+
+You have to make sure that when you have <a> tags in your html template files, they look like:
+
+     <a href="/app/something-else">link text</a>
+
+If you do not add the slash at the start of the href value, in other words if you use relative
+links, then it will work fine when you connect directly. However, when you connect via apache, the
+links will look like:
+
+    https://example.com/app/app/something-else
+
+This will not work.
+
+4) Remember that when you want to run a flask app on a remote server and correct directly, one
+needs to launch the app thusly:
+
+    % (.venv) python3 -m flask run
+
+There is a way to allow anyone on the Internet to access the app quickly. 
+You can do this if you want to, for example, test the app on a server but outside of apache,
+or if you are collaborating with others and want to show a 'not-for-production' version of
+the app for a brief time.
+
+    % (.venv) python3 -m flask run --host=0.0.0.0
+
