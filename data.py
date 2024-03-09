@@ -17,33 +17,75 @@ def db_exec(engine, sql):
 
 
 def ripa_data_main():
-    context = dict()
+    results = dict()
 
-    sql = "select * from ripa_counties;"
-    counties = db_exec(conn, sql)
+    results['title'] = 'All Counties'
 
-    rows = list()
+    sql = """
+         select substr(AGENCY_ORI,3,3) as code_num,
+                (select name from ripa_counties where code = code_num) as name,
+                count(0) as count,
+                min(DATE_OF_STOP) as min_date,
+                max(DATE_OF_STOP) as max_date
+                from ripa_summaries group by code_num order by code_num
+         """
+    results['entities'] = db_exec(conn, sql)
 
-    for county in counties:
+    for result in results['entities']:
+        result['code_href'] = f"county/{result['code_num']}"
 
-        sql = f"select count(0) as count from ripa_summaries_{county['code']};"
-        count = db_exec(conn, sql)[0]['count']
-
-        row = dict(county)
-        row['count'] = count
-
-        sql = f"select distinct(YEAR_OF_STOP) as year from ripa_summaries_{county['code']};"
-        years = [str(r['year']) for r in db_exec(conn, sql)]
-
-        row['years'] = ', '.join(years)
-
-        rows.append(row)
-
-    context['counties'] = rows
-
-    return context
+    return results
 
 
 def ripa_data():
-    results = {}
+    results = dict()
+    return results
+
+
+def ripa_agencies(num = None):
+    results = dict()
+
+    if num is None:
+        results['title'] = 'All Law Enforcement Agencies'
+
+        sql = """
+            select AGENCY_ORI as code_num,
+                   (select name from ripa_counties where code = code_num) as name,
+                   count(0) as count,
+                   min(DATE_OF_STOP) as min_date,
+                   max(DATE_OF_STOP) as max_date
+                   from ripa_summaries group by code_num order by code_num
+            """
+    else:
+        results['title'] = f"Law Enforcement Agencies - County: XXX"
+
+        sql = f"""
+            select AGENCY_ORI as code_num,
+                   (select name from ripa_counties where code = code_num) as name,
+                   count(0) as count,
+                   min(DATE_OF_STOP) as min_date,
+                   max(DATE_OF_STOP) as max_date
+                   from ripa_summaries
+                   where AGENCY_ORI like 'CA{num}%%'
+                   group by code_num order by code_num
+            """
+    agencies = db_exec(conn, sql)
+
+    if results['title'].endswith('XXX'):
+        sql = f"select name from ripa_counties where code = '{num}'"
+        name = db_exec(conn, sql)[0]['name']
+        results['title'] = results['title'].replace('XXX', name)
+
+    sql = """
+          select distinct(concat(AGENCY_ORI, '|', AGENCY_NAME)) as code_and_name
+          from ripa_summaries
+          """
+    for row in db_exec(conn, sql):
+        parts = row['code_and_name'].split('|')
+        for agency in agencies:
+            if agency['code_num'] == parts[0]:
+                agency['name'] = parts[1]
+
+    results['entities'] = agencies
+
     return results

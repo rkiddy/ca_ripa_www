@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+    <title>RIPA</title>
+    {% include "styles.html" %}
+</head>
+<body>
+<div style="padding: 25px 25px 25px 25px;">
+    <p align="right">
+        -&nbsp;<a href="/ripa/agencies/">All Agencies</a>
+    </p>
+    <h2>{{ title }}</h2>
+    <table class="table table-striped">
+    <tr>
+        <th>Code</th>
+        <th>Name</th>
+        <th>Stops #</th>
+        <th>Min Date</th>
+        <th>Max Date</th>
+    </tr>
+    {% for entity in entities %}
+        <tr>
+            <td>
+                {% if entity.code_href %}
+                    <a href="{{ entity.code_href }}">{{ entity.code_num }}</a>
+                {% else %}
+                    {{ entity.code_num }}
+                {% endif %}
+            </td>
+            <td>{{ entity.name }}</td>
+            <td>{{ entity.count }}</td>
+            <td>{{ entity.min_date }}</td>
+            <td>{{ entity.max_date }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+</body></html>

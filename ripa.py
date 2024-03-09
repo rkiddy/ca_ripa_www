@@ -17,7 +17,7 @@ env = Environment(loader=PackageLoader('ripa'))
 
 @ripa.route(f"/{cfg['WWW']}/")
 def ripa_main():
-    main = env.get_template('ripa_main.html')
+    main = env.get_template('ripa_list.html')
     context = data.ripa_data_main()
     return main.render(**context)
 
@@ -26,6 +26,20 @@ def ripa_main():
 def ripa_rest():
     rest_data = data.ripa_data()
     return jsonify(rest_data)
+
+
+@ripa.route(f"/{cfg['WWW']}/county/<num>")
+def ripa_county(num):
+    main = env.get_template('ripa_list.html')
+    context = data.ripa_agencies(num)
+    return main.render(**context)
+
+
+@ripa.route(f"/{cfg['WWW']}/agencies/")
+def ripa_agencies():
+    main = env.get_template('ripa_list.html')
+    context = data.ripa_agencies()
+    return main.render(**context)
 
 
 if __name__ == '__main__':
